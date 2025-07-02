@@ -1,0 +1,56 @@
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  #payroll-report-content,
+  #payroll-report-content * {
+    visibility: visible;
+  }
+
+  .print-only-content {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    display: block !important;
+  }
+
+  .print-hidden {
+    display: none !important;
+  }
+
+  /* Professional print styling */
+  @page {
+    size: A4;
+    margin: 2cm;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    page-break-inside: auto;
+  }
+
+  tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+
+  th,
+  td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: right;
+  }
+
+  th {
+    background-color: #f2f2f2;
+  }
+
+  h1,
+  h2,
+  h3 {
+    page-break-after: avoid;
+  }
+}
