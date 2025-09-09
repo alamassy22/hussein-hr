@@ -79,13 +79,7 @@ function App() {
   return (
     <AuthProvider>
       <DataPersistenceProvider>
-        {import.meta.env.VITE_TEMPO ? (
-          <AppContent />
-        ) : (
-          <Router>
-            <AppContent />
-          </Router>
-        )}
+        <AppContent />
       </DataPersistenceProvider>
     </AuthProvider>
   );
