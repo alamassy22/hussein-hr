@@ -34,9 +34,65 @@ export type UserType = {
 };
 
 export async function getCurrentUser(): Promise<UserType | null> {
-  // Return null if Supabase is not configured
+  // Handle mock authentication if Supabase is not configured
   if (!supabase) {
     console.warn("Supabase not configured. Using mock authentication.");
+    
+    // Check if user is logged in via mock auth
+    const isAuthenticated = localStorage.getItem("isAuthenticated");
+    const userEmail = localStorage.getItem("userEmail");
+    
+    if (isAuthenticated === "true" && userEmail) {
+      const superAdminEmail = import.meta.env.VITE_SUPER_ADMIN_EMAIL;
+      
+      if (userEmail === superAdminEmail) {
+        return {
+          id: 'super-admin-mock-id',
+          email: userEmail,
+          full_name: 'مدير النظام العام',
+          role: 'super_admin',
+          organization_id: null,
+          organization: null,
+          last_sign_in: new Date().toISOString(),
+        };
+      }
+      
+      // Check stored users
+      const storedUsers = JSON.parse(localStorage.getItem("systemUsers") || "[]");
+      const user = storedUsers.find((u: any) => u.username === userEmail);
+      
+      if (user) {
+        return {
+          id: `mock-user-${user.username}`,
+          email: userEmail,
+          full_name: user.fullName || user.username,
+          role: user.role || 'employee',
+          organization_id: 'mock-org-id',
+          organization: {
+            id: 'mock-org-id',
+            name: 'مؤسسة تجريبية',
+            logo_url: null,
+          },
+          last_sign_in: new Date().toISOString(),
+        };
+      }
+      
+      // Fallback user
+      return {
+        id: 'mock-user-id',
+        email: userEmail,
+        full_name: 'مستخدم تجريبي',
+        role: 'employee',
+        organization_id: 'mock-org-id',
+        organization: {
+          id: 'mock-org-id',
+          name: 'مؤسسة تجريبية',
+          logo_url: null,
+        },
+        last_sign_in: new Date().toISOString(),
+      };
+    }
+    
     return null;
   }
 
@@ -101,11 +157,44 @@ export async function signIn(
   email: string,
   password: string,
 ): Promise<{ user: any } | null> {
-  // Handle mock authentication if Supabase is not configured
-  if (!supabase) {
-    console.warn("Supabase not configured. Using mock authentication.");
+  // Get super admin credentials from environment variables
+  const superAdminEmail = import.meta.env.VITE_SUPER_ADMIN_EMAIL;
+  const superAdminPassword = import.meta.env.VITE_SUPER_ADMIN_PASSWORD;
+
+  // Handle mock authentication if Supabase is not configured OR for super admin
+  if (!supabase || (email === superAdminEmail && password === superAdminPassword)) {
+    console.warn("Using mock authentication.");
     
-    // Simple mock authentication for demo purposes
+    // Check super admin credentials
+    if (email === superAdminEmail && password === superAdminPassword) {
+      return {
+        user: {
+          id: 'super-admin-mock-id',
+          email: email,
+          user_metadata: {
+            full_name: 'مدير النظام العام'
+          }
+        }
+      };
+    }
+    
+    // Check stored users in localStorage
+    const storedUsers = JSON.parse(localStorage.getItem("systemUsers") || "[]");
+    const user = storedUsers.find((u: any) => u.username === email && u.password === password);
+    
+    if (user) {
+      return {
+        user: {
+          id: `mock-user-${user.username}`,
+          email: email,
+          user_metadata: {
+            full_name: user.fullName || user.username
+          }
+        }
+      };
+    }
+    
+    // Simple fallback for any email/password combination in demo mode
     if (email && password) {
       return {
         user: {
@@ -121,17 +210,6 @@ export async function signIn(
   }
 
   try {
-    // Get super admin credentials from environment variables
-    const superAdminEmail = import.meta.env.VITE_SUPER_ADMIN_EMAIL;
-    const superAdminPassword = import.meta.env.VITE_SUPER_ADMIN_PASSWORD;
-
-    // Check if credentials are available
-    if (!superAdminEmail || !superAdminPassword) {
-      throw new Error(
-        "مطلوب بيانات مدير النظام. الرجاء تعيين متغيرات البيئة VITE_SUPER_ADMIN_EMAIL و VITE_SUPER_ADMIN_PASSWORD",
-      );
-    }
-
     // Check for super admin credentials
     if (email === superAdminEmail && password === superAdminPassword) {
       try {
@@ -242,8 +320,11 @@ export async function signIn(
 }
 
 export async function signOut() {
+  // Handle mock authentication sign out
   if (!supabase) {
     console.warn("Supabase not configured. Mock sign out.");
+    localStorage.removeItem("isAuthenticated");
+    localStorage.removeItem("userEmail");
     return;
   }
 

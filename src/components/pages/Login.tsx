@@ -60,6 +60,10 @@ const Login = () => {
         return;
       }
 
+      // Store authentication state for mock auth
+      localStorage.setItem("isAuthenticated", "true");
+      localStorage.setItem("userEmail", email);
+
       try {
         const currentUser = await getCurrentUser();
 
