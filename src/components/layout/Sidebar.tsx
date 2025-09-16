@@ -174,13 +174,13 @@ const Sidebar = ({ className }: SidebarProps) => {
       id: "letters-and-notices",
       icon: <FileText size={20} />,
       label: "الخطابات والإشعارات",
-      permission: "canViewLetters",
+      permission: null,
     },
     {
       id: "custody",
       icon: <Shield size={20} />,
       label: "إدارة العهد",
-      permission: "canViewCustody",
+      permission: null,
     },
     {
       id: "payroll",

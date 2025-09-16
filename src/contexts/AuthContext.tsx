@@ -138,6 +138,10 @@ const getPermissionsByRole = (role: string): UserPermissions => {
         canManageRecruitment: true,
         canViewTraining: true,
         canManageTraining: true,
+        canViewLetters: true,
+        canManageLetters: true,
+        canViewCustody: true,
+        canManageCustody: true,
       };
     default:
       return {
@@ -166,6 +170,10 @@ const getPermissionsByRole = (role: string): UserPermissions => {
         canManageRecruitment: false,
         canViewTraining: false,
         canManageTraining: false,
+        canViewLetters: false,
+        canManageLetters: false,
+        canViewCustody: false,
+        canManageCustody: false,
       };
   }
 };
