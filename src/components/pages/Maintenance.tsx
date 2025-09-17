@@ -30,17 +30,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Plus,
-  Search,
-  Filter,
-  Tool,
-  AlertTriangle,
-  CheckCircle,
-  Clock,
-  Printer,
-  Download,
-} from "lucide-react";
+import { Plus, Search, Filter, PenTool as Tool, AlertTriangle, CheckCircle, Clock, Printer, Download } from "lucide-react";
 import MaintenanceRequestForm from "@/components/maintenance/MaintenanceRequestForm";
 import MaintenanceRequestView from "@/components/maintenance/MaintenanceRequestView";
 import { useReactToPrint } from "react-to-print";
@@ -56,7 +46,7 @@ const Maintenance = () => {
   const printRef = useRef<HTMLDivElement>(null);
 
   // Sample maintenance requests data
-  const [maintenanceRequests, setMaintenanceRequests] = useState<any[]>([
+  const initialMaintenanceRequests = [
     {
       id: 1,
       title: "صيانة مكيف الهواء",
@@ -112,7 +102,33 @@ const Maintenance = () => {
       description: "جهاز العرض لا يعمل بشكل صحيح ويظهر الصورة بألوان غير صحيحة",
       type: "أجهزة إلكترونية",
     },
-  ]);
+  ];
+
+  const [maintenanceRequests, setMaintenanceRequests] = useState<any[]>([]);
+
+  // Load maintenance requests from localStorage on component mount
+  React.useEffect(() => {
+    const savedRequests = localStorage.getItem('hrms_maintenance_requests');
+    if (savedRequests) {
+      try {
+        setMaintenanceRequests(JSON.parse(savedRequests));
+      } catch (error) {
+        console.error('Error loading maintenance requests:', error);
+        setMaintenanceRequests(initialMaintenanceRequests);
+      }
+    } else {
+      setMaintenanceRequests(initialMaintenanceRequests);
+    }
+  }, []);
+
+  // Save maintenance requests to localStorage whenever they change
+  React.useEffect(() => {
+    try {
+      localStorage.setItem('hrms_maintenance_requests', JSON.stringify(maintenanceRequests));
+    } catch (error) {
+      console.error('Error saving maintenance requests:', error);
+    }
+  }, [maintenanceRequests]);
 
   // Filter maintenance requests based on active tab and search query
   const filteredRequests = maintenanceRequests.filter((request) => {

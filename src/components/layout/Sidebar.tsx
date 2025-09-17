@@ -219,8 +219,20 @@ const Sidebar = ({ className }: SidebarProps) => {
     return hasPermission(item.permission as any);
   });
 
+  // Add settings to navigation items for users with permission
+  const finalNavItems = [...navItems];
+  
+  // Add settings if user has permission or is super admin
+  if (hasPermission("canManageSettings") || user?.role === "super_admin") {
+    finalNavItems.push({
+      id: "settings",
+      icon: <Settings size={20} />,
+      label: "الإعدادات",
+      permission: null,
+    });
+  }
   // Customize labels for employees
-  const finalNavItems = navItems.map((item) => {
+  const customizedNavItems = finalNavItems.map((item) => {
     if (isEmployee) {
       switch (item.id) {
         case "dashboard":
@@ -266,7 +278,7 @@ const Sidebar = ({ className }: SidebarProps) => {
 
       <div className="flex-1 overflow-auto py-4 px-2">
         <nav className="flex flex-col gap-1">
-          {finalNavItems.map((item) => (
+          {customizedNavItems.map((item) => (
             <NavItem
               key={item.id}
               icon={item.icon}
@@ -281,15 +293,6 @@ const Sidebar = ({ className }: SidebarProps) => {
 
       <div className="border-t p-2">
         <nav className="flex flex-col gap-1">
-          {hasPermission("canManageSettings") && (
-            <NavItem
-              icon={<Settings size={20} />}
-              label="الإعدادات"
-              isActive={activeItem === "settings"}
-              isCollapsed={collapsed}
-              onClick={() => handleNavigation("settings")}
-            />
-          )}
           <NavItem
             icon={<LogOut size={20} />}
             label="تسجيل الخروج"

@@ -147,7 +147,7 @@ interface PayrollListProps {
 
 const PayrollList = ({ className }: PayrollListProps) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [payrolls, setPayrolls] = useState<PayrollData[]>(initialPayrolls);
+  const [payrolls, setPayrolls] = useState<PayrollData[]>([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
@@ -156,6 +156,30 @@ const PayrollList = ({ className }: PayrollListProps) => {
     null,
   );
   const printFrameRef = useRef<HTMLIFrameElement>(null);
+
+  // Load payrolls from localStorage on component mount
+  React.useEffect(() => {
+    const savedPayrolls = localStorage.getItem('hrms_payrolls');
+    if (savedPayrolls) {
+      try {
+        setPayrolls(JSON.parse(savedPayrolls));
+      } catch (error) {
+        console.error('Error loading payrolls:', error);
+        setPayrolls(initialPayrolls);
+      }
+    } else {
+      setPayrolls(initialPayrolls);
+    }
+  }, []);
+
+  // Save payrolls to localStorage whenever payrolls change
+  React.useEffect(() => {
+    try {
+      localStorage.setItem('hrms_payrolls', JSON.stringify(payrolls));
+    } catch (error) {
+      console.error('Error saving payrolls:', error);
+    }
+  }, [payrolls]);
 
   const filteredPayrolls = payrolls.filter(
     (payroll) =>

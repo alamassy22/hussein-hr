@@ -49,7 +49,7 @@ const Leaves = () => {
   const printAdvanceRef = useRef<HTMLDivElement>(null);
 
   // Sample leave requests data
-  const [leaveRequests, setLeaveRequests] = useState<any[]>([
+  const initialLeaveRequests = [
     {
       id: "1",
       employeeName: "أحمد محمد",
@@ -70,7 +70,33 @@ const Leaves = () => {
       submissionDate: "2023-06-05",
       reason: "إجازة مرضية",
     },
-  ]);
+  ];
+
+  const [leaveRequests, setLeaveRequests] = useState<any[]>([]);
+
+  // Load leave requests from localStorage on component mount
+  React.useEffect(() => {
+    const savedRequests = localStorage.getItem('hrms_leave_requests');
+    if (savedRequests) {
+      try {
+        setLeaveRequests(JSON.parse(savedRequests));
+      } catch (error) {
+        console.error('Error loading leave requests:', error);
+        setLeaveRequests(initialLeaveRequests);
+      }
+    } else {
+      setLeaveRequests(initialLeaveRequests);
+    }
+  }, []);
+
+  // Save leave requests to localStorage whenever they change
+  React.useEffect(() => {
+    try {
+      localStorage.setItem('hrms_leave_requests', JSON.stringify(leaveRequests));
+    } catch (error) {
+      console.error('Error saving leave requests:', error);
+    }
+  }, [leaveRequests]);
 
   const handleAddRequest = () => {
     setSelectedRequest(null);

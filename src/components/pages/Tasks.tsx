@@ -45,7 +45,7 @@ const Tasks = () => {
   const taskListPrintRef = useRef(null);
 
   // Sample tasks data
-  const [tasks, setTasks] = useState([
+  const initialTasks = [
     {
       id: 1,
       title: "مراجعة طلبات التوظيف",
@@ -92,7 +92,33 @@ const Tasks = () => {
       status: "قيد التنفيذ",
       dueDate: "2023-06-18",
     },
-  ]);
+  ];
+
+  const [tasks, setTasks] = useState([]);
+
+  // Load tasks from localStorage on component mount
+  React.useEffect(() => {
+    const savedTasks = localStorage.getItem('hrms_tasks');
+    if (savedTasks) {
+      try {
+        setTasks(JSON.parse(savedTasks));
+      } catch (error) {
+        console.error('Error loading tasks:', error);
+        setTasks(initialTasks);
+      }
+    } else {
+      setTasks(initialTasks);
+    }
+  }, []);
+
+  // Save tasks to localStorage whenever tasks change
+  React.useEffect(() => {
+    try {
+      localStorage.setItem('hrms_tasks', JSON.stringify(tasks));
+    } catch (error) {
+      console.error('Error saving tasks:', error);
+    }
+  }, [tasks]);
 
   // Filter tasks based on active tab and search term
   const filteredTasks = tasks.filter((task) => {

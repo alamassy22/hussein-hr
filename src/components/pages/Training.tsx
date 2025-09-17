@@ -47,7 +47,7 @@ const Training = () => {
   const [selectedParticipant, setSelectedParticipant] = useState<any>(null);
 
   // Sample training courses data
-  const [trainingCourses, setTrainingCourses] = useState([
+  const initialTrainingCourses = [
     {
       id: 1,
       title: "مهارات القيادة الإدارية",
@@ -133,10 +133,36 @@ const Training = () => {
       ],
       duration: "يومان (16 ساعة تدريبية)",
     },
-  ]);
+  ];
+
+  const [trainingCourses, setTrainingCourses] = useState([]);
+
+  // Load training courses from localStorage on component mount
+  React.useEffect(() => {
+    const savedCourses = localStorage.getItem('hrms_training_courses');
+    if (savedCourses) {
+      try {
+        setTrainingCourses(JSON.parse(savedCourses));
+      } catch (error) {
+        console.error('Error loading training courses:', error);
+        setTrainingCourses(initialTrainingCourses);
+      }
+    } else {
+      setTrainingCourses(initialTrainingCourses);
+    }
+  }, []);
+
+  // Save training courses to localStorage whenever they change
+  React.useEffect(() => {
+    try {
+      localStorage.setItem('hrms_training_courses', JSON.stringify(trainingCourses));
+    } catch (error) {
+      console.error('Error saving training courses:', error);
+    }
+  }, [trainingCourses]);
 
   // Sample enrolled employees data
-  const [enrollments, setEnrollments] = useState([
+  const initialEnrollments = [
     {
       id: 1,
       employeeName: "خالد محمد",
@@ -173,7 +199,33 @@ const Training = () => {
       enrollmentDate: "2023-06-15",
       status: "قيد الانتظار",
     },
-  ]);
+  ];
+
+  const [enrollments, setEnrollments] = useState([]);
+
+  // Load enrollments from localStorage on component mount
+  React.useEffect(() => {
+    const savedEnrollments = localStorage.getItem('hrms_enrollments');
+    if (savedEnrollments) {
+      try {
+        setEnrollments(JSON.parse(savedEnrollments));
+      } catch (error) {
+        console.error('Error loading enrollments:', error);
+        setEnrollments(initialEnrollments);
+      }
+    } else {
+      setEnrollments(initialEnrollments);
+    }
+  }, []);
+
+  // Save enrollments to localStorage whenever they change
+  React.useEffect(() => {
+    try {
+      localStorage.setItem('hrms_enrollments', JSON.stringify(enrollments));
+    } catch (error) {
+      console.error('Error saving enrollments:', error);
+    }
+  }, [enrollments]);
 
   const handleViewCourse = (courseId: number) => {
     // In a real app, you would fetch the course details by ID

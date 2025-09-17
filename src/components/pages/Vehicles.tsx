@@ -51,7 +51,7 @@ const Vehicles = () => {
   const [selectedVehicle, setSelectedVehicle] = useState(null);
 
   // Sample vehicles data as initial state
-  const [vehicles, setVehicles] = useState([
+  const initialVehicles = [
     {
       id: 1,
       plateNumber: "أ ب ج 1234",
@@ -122,7 +122,33 @@ const Vehicles = () => {
       color: "أحمر",
       fuelType: "بنزين",
     },
-  ]);
+  ];
+
+  const [vehicles, setVehicles] = useState([]);
+
+  // Load vehicles from localStorage on component mount
+  React.useEffect(() => {
+    const savedVehicles = localStorage.getItem('hrms_vehicles');
+    if (savedVehicles) {
+      try {
+        setVehicles(JSON.parse(savedVehicles));
+      } catch (error) {
+        console.error('Error loading vehicles:', error);
+        setVehicles(initialVehicles);
+      }
+    } else {
+      setVehicles(initialVehicles);
+    }
+  }, []);
+
+  // Save vehicles to localStorage whenever they change
+  React.useEffect(() => {
+    try {
+      localStorage.setItem('hrms_vehicles', JSON.stringify(vehicles));
+    } catch (error) {
+      console.error('Error saving vehicles:', error);
+    }
+  }, [vehicles]);
 
   // Filter vehicles based on active tab and search term
   const filteredVehicles = vehicles.filter((vehicle) => {

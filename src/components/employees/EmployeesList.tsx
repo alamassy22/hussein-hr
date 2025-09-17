@@ -100,7 +100,7 @@ interface EmployeesListProps {
 
 const EmployeesList = ({ className }: EmployeesListProps) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [employees, setEmployees] = useState<Employee[]>(initialEmployees);
+  const [employees, setEmployees] = useState<Employee[]>([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
@@ -108,6 +108,30 @@ const EmployeesList = ({ className }: EmployeesListProps) => {
     null,
   );
   const printFrameRef = useRef<HTMLIFrameElement>(null);
+
+  // Load employees from localStorage on component mount
+  React.useEffect(() => {
+    const savedEmployees = localStorage.getItem('hrms_employees');
+    if (savedEmployees) {
+      try {
+        setEmployees(JSON.parse(savedEmployees));
+      } catch (error) {
+        console.error('Error loading employees:', error);
+        setEmployees(initialEmployees);
+      }
+    } else {
+      setEmployees(initialEmployees);
+    }
+  }, []);
+
+  // Save employees to localStorage whenever employees change
+  React.useEffect(() => {
+    try {
+      localStorage.setItem('hrms_employees', JSON.stringify(employees));
+    } catch (error) {
+      console.error('Error saving employees:', error);
+    }
+  }, [employees]);
 
   const filteredEmployees = employees.filter(
     (employee) =>

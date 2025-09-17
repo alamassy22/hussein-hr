@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase";
 import { useAuth } from "./AuthContext";
 
 interface DataPersistenceContextType {
@@ -22,34 +21,26 @@ export function DataPersistenceProvider({
   const { user } = useAuth();
 
   const saveData = async (key: string, data: any) => {
-    if (!user) return;
+    if (!user) {
+      // Save to localStorage if no user (fallback)
+      try {
+        localStorage.setItem(`hrms_${key}`, JSON.stringify(data));
+      } catch (error) {
+        console.error("Error saving to localStorage:", error);
+      }
+      return;
+    }
 
     setLoading(true);
     try {
-      // Check if data already exists
-      const { data: existingData } = await supabase
-        .from("user_data")
-        .select()
-        .eq("user_id", user.id)
-        .eq("data_key", key)
-        .single();
-
-      if (existingData) {
-        // Update existing data
-        await supabase
-          .from("user_data")
-          .update({ data_value: data, updated_at: new Date().toISOString() })
-          .eq("user_id", user.id)
-          .eq("data_key", key);
-      } else {
-        // Insert new data
-        await supabase.from("user_data").insert({
-          user_id: user.id,
-          organization_id: user.organization_id,
-          data_key: key,
-          data_value: data,
-        });
-      }
+      // Save to localStorage with user-specific key
+      const userKey = `hrms_${user.id}_${key}`;
+      localStorage.setItem(userKey, JSON.stringify({
+        data,
+        timestamp: new Date().toISOString(),
+        user_id: user.id,
+        organization_id: user.organization_id
+      }));
     } catch (error) {
       console.error("Error saving data:", error);
     } finally {
@@ -58,18 +49,27 @@ export function DataPersistenceProvider({
   };
 
   const loadData = async (key: string) => {
-    if (!user) return null;
+    if (!user) {
+      // Load from localStorage if no user (fallback)
+      try {
+        const stored = localStorage.getItem(`hrms_${key}`);
+        return stored ? JSON.parse(stored) : null;
+      } catch (error) {
+        console.error("Error loading from localStorage:", error);
+        return null;
+      }
+    }
 
     setLoading(true);
     try {
-      const { data } = await supabase
-        .from("user_data")
-        .select("data_value")
-        .eq("user_id", user.id)
-        .eq("data_key", key)
-        .single();
-
-      return data?.data_value || null;
+      // Load from localStorage with user-specific key
+      const userKey = `hrms_${user.id}_${key}`;
+      const stored = localStorage.getItem(userKey);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        return parsed.data || null;
+      }
+      return null;
     } catch (error) {
       console.error("Error loading data:", error);
       return null;
@@ -79,15 +79,21 @@ export function DataPersistenceProvider({
   };
 
   const clearData = async (key: string) => {
-    if (!user) return;
+    if (!user) {
+      // Clear from localStorage if no user (fallback)
+      try {
+        localStorage.removeItem(`hrms_${key}`);
+      } catch (error) {
+        console.error("Error clearing from localStorage:", error);
+      }
+      return;
+    }
 
     setLoading(true);
     try {
-      await supabase
-        .from("user_data")
-        .delete()
-        .eq("user_id", user.id)
-        .eq("data_key", key);
+      // Clear from localStorage with user-specific key
+      const userKey = `hrms_${user.id}_${key}`;
+      localStorage.removeItem(userKey);
     } catch (error) {
       console.error("Error clearing data:", error);
     } finally {

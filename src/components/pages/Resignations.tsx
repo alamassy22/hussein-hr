@@ -56,7 +56,7 @@ const Resignations = () => {
   );
 
   // Sample resignation data
-  const [resignations, setResignations] = useState<any[]>([
+  const initialResignations = [
     {
       id: "1",
       employeeName: "أحمد محمد",
@@ -111,7 +111,33 @@ const Resignations = () => {
       status: "موافق",
       submissionDate: "2023-07-10",
     },
-  ]);
+  ];
+
+  const [resignations, setResignations] = useState<any[]>([]);
+
+  // Load resignations from localStorage on component mount
+  React.useEffect(() => {
+    const savedResignations = localStorage.getItem('hrms_resignations');
+    if (savedResignations) {
+      try {
+        setResignations(JSON.parse(savedResignations));
+      } catch (error) {
+        console.error('Error loading resignations:', error);
+        setResignations(initialResignations);
+      }
+    } else {
+      setResignations(initialResignations);
+    }
+  }, []);
+
+  // Save resignations to localStorage whenever they change
+  React.useEffect(() => {
+    try {
+      localStorage.setItem('hrms_resignations', JSON.stringify(resignations));
+    } catch (error) {
+      console.error('Error saving resignations:', error);
+    }
+  }, [resignations]);
 
   const handleAddResignation = () => {
     setSelectedResignation(null);
