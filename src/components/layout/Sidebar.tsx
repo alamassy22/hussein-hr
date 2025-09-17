@@ -108,67 +108,67 @@ const Sidebar = ({ className }: SidebarProps) => {
       id: "employees",
       icon: <Users size={20} />,
       label: "الموظفين",
-      permission: "canViewEmployees",
+      permission: null, // Always show for super admin
     },
     {
       id: "attendance",
       icon: <ClipboardCheck size={20} />,
       label: "الحضور",
-      permission: "canViewAttendance",
+      permission: null, // Always show for super admin
     },
     {
       id: "leaves",
       icon: <CalendarDays size={20} />,
       label: "الإجازات",
-      permission: "canViewLeaves",
+      permission: null, // Always show for super admin
     },
     {
       id: "resignations",
       icon: <FileText size={20} />,
       label: "الاستقالات",
-      permission: "canSubmitResignation",
+      permission: null, // Always show for super admin
     },
     {
       id: "recruitment",
       icon: <Users size={20} />,
       label: "التوظيف",
-      permission: "canViewRecruitment",
+      permission: null, // Always show for super admin
     },
     {
       id: "training",
       icon: <FileText size={20} />,
       label: "التدريب",
-      permission: "canViewTraining",
+      permission: null, // Always show for super admin
     },
     {
       id: "organizational-structure",
       icon: <Layers3 size={20} />,
       label: "الهيكل التنظيمي",
-      permission: "canManageSettings",
+      permission: null, // Always show for super admin
     },
     {
       id: "planning-and-execution",
       icon: <BarChart3 size={20} />,
       label: "التخطيط والتنفيذ",
-      permission: "canManageSettings",
+      permission: null, // Always show for super admin
     },
     {
       id: "tasks",
       icon: <ClipboardCheck size={20} />,
       label: "إدارة المهام",
-      permission: "canViewTasks",
+      permission: null, // Always show for super admin
     },
     {
       id: "maintenance",
       icon: <Settings size={20} />,
       label: "التشغيل والصيانة",
-      permission: "canViewMaintenance",
+      permission: null, // Always show for super admin
     },
     {
       id: "vehicles",
       icon: <FileText size={20} />,
       label: "إدارة السيارات",
-      permission: "canViewVehicles",
+      permission: null, // Always show for super admin
     },
     {
       id: "letters-and-notices",
@@ -186,13 +186,13 @@ const Sidebar = ({ className }: SidebarProps) => {
       id: "payroll",
       icon: <DollarSign size={20} />,
       label: "المرتبات",
-      permission: "canViewPayroll",
+      permission: null, // Always show for super admin
     },
     {
       id: "reports",
       icon: <BarChart3 size={20} />,
       label: "التقارير",
-      permission: "canViewReports",
+      permission: null, // Always show for super admin
     },
     {
       id: "super-admin",
@@ -208,7 +208,14 @@ const Sidebar = ({ className }: SidebarProps) => {
     if (item.id === "super-admin") {
       return user?.role === "super_admin";
     }
-    if (!item.permission) return true; // Always show dashboard
+    
+    // For super admin, show all items
+    if (user?.role === "super_admin") {
+      return true;
+    }
+    
+    // For other users, check permissions
+    if (!item.permission) return true;
     return hasPermission(item.permission as any);
   });
 
