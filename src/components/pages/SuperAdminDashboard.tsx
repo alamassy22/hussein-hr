@@ -49,6 +49,13 @@ const SuperAdminDashboard = () => {
 
   const fetchOrganizations = async () => {
     try {
+      // Check if supabase is properly initialized
+      if (!supabase) {
+        console.warn('Supabase client is not initialized. Please check your environment variables.');
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
 
       // Fetch organizations with user count
