@@ -220,7 +220,7 @@ const Sidebar = ({ className }: SidebarProps) => {
   });
 
   // Customize labels for employees
-  const customizedNavItems = finalNavItems.map((item) => {
+  const customizedNavItems = navItems.map((item) => {
     if (isEmployee) {
       switch (item.id) {
         case "dashboard":
