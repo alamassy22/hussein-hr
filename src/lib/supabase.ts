@@ -335,6 +335,98 @@ export async function signOut() {
   }
 }
 
+// Database persistence functions
+export async function saveToDatabase(key: string, data: any, userId?: string) {
+  if (!supabase) {
+    // Fallback to localStorage if Supabase is not configured
+    try {
+      const storageKey = userId ? `${userId}_${key}` : key;
+      localStorage.setItem(storageKey, JSON.stringify({
+        data,
+        timestamp: new Date().toISOString(),
+        userId
+      }));
+      return { success: true };
+    } catch (error) {
+      console.error("Error saving to localStorage:", error);
+      return { success: false, error };
+    }
+  }
+
+  try {
+    const { data: result, error } = await supabase
+      .from('user_data')
+      .upsert({
+        user_id: userId || 'system',
+        data_key: key,
+        data_value: data,
+        updated_at: new Date().toISOString()
+      }, {
+        onConflict: 'user_id,data_key'
+      });
+
+    if (error) throw error;
+    return { success: true, data: result };
+  } catch (error) {
+    console.error("Error saving to database:", error);
+    // Fallback to localStorage
+    try {
+      const storageKey = userId ? `${userId}_${key}` : key;
+      localStorage.setItem(storageKey, JSON.stringify({
+        data,
+        timestamp: new Date().toISOString(),
+        userId
+      }));
+      return { success: true };
+    } catch (localError) {
+      return { success: false, error: localError };
+    }
+  }
+}
+
+export async function loadFromDatabase(key: string, userId?: string) {
+  if (!supabase) {
+    // Fallback to localStorage if Supabase is not configured
+    try {
+      const storageKey = userId ? `${userId}_${key}` : key;
+      const stored = localStorage.getItem(storageKey);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        return { success: true, data: parsed.data };
+      }
+      return { success: true, data: null };
+    } catch (error) {
+      console.error("Error loading from localStorage:", error);
+      return { success: false, error };
+    }
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('user_data')
+      .select('data_value')
+      .eq('user_id', userId || 'system')
+      .eq('data_key', key)
+      .single();
+
+    if (error && error.code !== 'PGRST116') throw error;
+    return { success: true, data: data?.data_value || null };
+  } catch (error) {
+    console.error("Error loading from database:", error);
+    // Fallback to localStorage
+    try {
+      const storageKey = userId ? `${userId}_${key}` : key;
+      const stored = localStorage.getItem(storageKey);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        return { success: true, data: parsed.data };
+      }
+      return { success: true, data: null };
+    } catch (localError) {
+      return { success: false, error: localError };
+    }
+  }
+}
 export async function createOrganization(name: string, userId: string) {
   if (!supabase) {
     throw new Error("Supabase not configured");

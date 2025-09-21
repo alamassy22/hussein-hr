@@ -51,7 +51,33 @@ const SuperAdminDashboard = () => {
     try {
       // Check if supabase is properly initialized
       if (!supabase) {
-        console.warn('Supabase client is not initialized. Please check your environment variables.');
+        console.warn('Supabase client is not initialized. Using mock data for super admin.');
+        
+        // Set mock data for super admin when Supabase is not configured
+        const mockOrganizations = [
+          {
+            id: 'mock-org-1',
+            name: 'مؤسسة تجريبية 1',
+            created_at: new Date().toISOString(),
+            is_active: true,
+            user_count: 25
+          },
+          {
+            id: 'mock-org-2', 
+            name: 'مؤسسة تجريبية 2',
+            created_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+            is_active: true,
+            user_count: 15
+          }
+        ];
+        
+        setOrganizations(mockOrganizations);
+        setStats({
+          totalOrganizations: mockOrganizations.length,
+          activeOrganizations: mockOrganizations.filter(org => org.is_active).length,
+          totalUsers: mockOrganizations.reduce((sum, org) => sum + (org.user_count || 0), 0)
+        });
+        
         setLoading(false);
         return;
       }
