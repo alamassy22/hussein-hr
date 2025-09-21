@@ -219,18 +219,6 @@ const Sidebar = ({ className }: SidebarProps) => {
     return hasPermission(item.permission as any);
   });
 
-  // Add settings to navigation items for users with permission
-  const finalNavItems = [...navItems];
-  
-  // Add settings if user has permission or is super admin
-  if (hasPermission("canManageSettings") || user?.role === "super_admin") {
-    finalNavItems.push({
-      id: "settings",
-      icon: <Settings size={20} />,
-      label: "الإعدادات",
-      permission: null,
-    });
-  }
   // Customize labels for employees
   const customizedNavItems = finalNavItems.map((item) => {
     if (isEmployee) {
