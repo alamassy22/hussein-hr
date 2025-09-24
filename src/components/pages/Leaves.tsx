@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import { useLocation } from "react-router-dom";
 import MainLayout from "../layout/MainLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import LeaveRequestForm from "../leaves/LeaveRequestForm";
@@ -32,6 +33,7 @@ import AdvanceRequestForm from "../advances/AdvanceRequestForm";
 import PrintWrapper from "@/components/ui/print-wrapper";
 
 const Leaves = () => {
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState("list");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -88,6 +90,26 @@ const Leaves = () => {
       setLeaveRequests(initialLeaveRequests);
     }
   }, []);
+
+  // Handle notification navigation
+  React.useEffect(() => {
+    if (location.state?.highlightId && location.state?.notificationType === "leave") {
+      const targetRequest = leaveRequests.find(req => req.id === location.state.highlightId);
+      if (targetRequest) {
+        // Highlight the specific request
+        setTimeout(() => {
+          const element = document.querySelector(`[data-request-id="${location.state.highlightId}"]`);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            element.classList.add('bg-yellow-100', 'border-yellow-300');
+            setTimeout(() => {
+              element.classList.remove('bg-yellow-100', 'border-yellow-300');
+            }, 3000);
+          }
+        }, 100);
+      }
+    }
+  }, [location.state, leaveRequests]);
 
   // Save leave requests to localStorage whenever they change
   React.useEffect(() => {
@@ -199,7 +221,7 @@ const Leaves = () => {
                 </TableHeader>
                 <TableBody>
                   {leaveRequests.map((request) => (
-                    <TableRow key={request.id}>
+                    <TableRow key={request.id} data-request-id={request.id}>
                       <TableCell>{request.employeeName}</TableCell>
                       <TableCell>
                         {request.leaveType === "annual" && "سنوية"}

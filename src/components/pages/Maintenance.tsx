@@ -1,5 +1,6 @@
 import React from "react";
 import { useState, useRef } from "react";
+import { useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -38,6 +39,7 @@ import { useReactToPrint } from "react-to-print";
 import "@/components/reports/print-styles.css";
 
 const Maintenance = () => {
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState("all");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
@@ -121,6 +123,26 @@ const Maintenance = () => {
       setMaintenanceRequests(initialMaintenanceRequests);
     }
   }, []);
+
+  // Handle notification navigation
+  React.useEffect(() => {
+    if (location.state?.highlightId && location.state?.notificationType === "maintenance") {
+      const targetRequest = maintenanceRequests.find(req => req.id.toString() === location.state.highlightId);
+      if (targetRequest) {
+        // Highlight the specific request
+        setTimeout(() => {
+          const element = document.querySelector(`[data-request-id="${location.state.highlightId}"]`);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            element.classList.add('bg-yellow-100', 'border-yellow-300');
+            setTimeout(() => {
+              element.classList.remove('bg-yellow-100', 'border-yellow-300');
+            }, 3000);
+          }
+        }, 100);
+      }
+    }
+  }, [location.state, maintenanceRequests]);
 
   // Save maintenance requests to localStorage whenever they change
   React.useEffect(() => {
@@ -415,7 +437,7 @@ const Maintenance = () => {
                   </TableHeader>
                   <TableBody>
                     {filteredRequests.map((request) => (
-                      <TableRow key={request.id}>
+                      <TableRow key={request.id} data-request-id={request.id}>
                         <TableCell className="font-medium">
                           {request.title}
                         </TableCell>

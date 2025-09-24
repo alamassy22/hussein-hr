@@ -195,6 +195,12 @@ const Sidebar = ({ className }: SidebarProps) => {
       permission: null, // Always show for super admin
     },
     {
+      id: "settings",
+      icon: <Settings size={20} />,
+      label: "الإعدادات",
+      permission: null, // Will be filtered by role check
+    },
+    {
       id: "super-admin",
       icon: <Settings size={20} />,
       label: "لوحة المسؤول العام",
@@ -207,6 +213,11 @@ const Sidebar = ({ className }: SidebarProps) => {
     // Special handling for super admin dashboard
     if (item.id === "super-admin") {
       return user?.role === "super_admin";
+    }
+    
+    // Special handling for settings
+    if (item.id === "settings") {
+      return user?.role === "super_admin" || user?.role === "org_admin";
     }
     
     // For super admin, show all items

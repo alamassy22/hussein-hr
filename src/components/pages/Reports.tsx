@@ -1,4 +1,5 @@
 import React from "react";
+import { useLocation } from "react-router-dom";
 import MainLayout from "../layout/MainLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -11,11 +12,21 @@ import TurnoverCalculator from "../turnover/TurnoverCalculator";
 import ExpiredIDsReport from "../reports/ExpiredIDsReport";
 
 const Reports = () => {
+  const location = useLocation();
+  const [activeTab, setActiveTab] = React.useState("employees");
+
+  // Handle notification navigation to expired IDs tab
+  React.useEffect(() => {
+    if (location.state?.highlightId === "expired-ids" && location.state?.notificationType === "expired_id") {
+      setActiveTab("expired-ids");
+    }
+  }, [location.state]);
+
   return (
     <MainLayout title="التقارير" subtitle="عرض وطباعة التقارير المختلفة">
       <Card>
         <CardHeader className="pb-0">
-          <Tabs defaultValue="employees">
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg font-semibold">التقارير</CardTitle>
               <TabsList>

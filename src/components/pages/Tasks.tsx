@@ -1,5 +1,6 @@
 import React from "react";
 import { useState, useRef, forwardRef } from "react";
+import { useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -36,6 +37,7 @@ import TaskPrint from "@/components/tasks/TaskPrint";
 import { useReactToPrint } from "react-to-print";
 
 const Tasks = () => {
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState("all");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
@@ -111,6 +113,26 @@ const Tasks = () => {
       setTasks(initialTasks);
     }
   }, []);
+
+  // Handle notification navigation
+  React.useEffect(() => {
+    if (location.state?.highlightId && location.state?.notificationType === "task") {
+      const targetTask = tasks.find(task => task.id.toString() === location.state.highlightId);
+      if (targetTask) {
+        // Highlight the specific task
+        setTimeout(() => {
+          const element = document.querySelector(`[data-task-id="${location.state.highlightId}"]`);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            element.classList.add('bg-yellow-100', 'border-yellow-300');
+            setTimeout(() => {
+              element.classList.remove('bg-yellow-100', 'border-yellow-300');
+            }, 3000);
+          }
+        }, 100);
+      }
+    }
+  }, [location.state, tasks]);
 
   // Save tasks to localStorage whenever tasks change
   React.useEffect(() => {
@@ -545,7 +567,7 @@ const TasksTable = ({
           </TableRow>
         ) : (
           tasks.map((task) => (
-            <TableRow key={task.id}>
+            <TableRow key={task.id} data-task-id={task.id}>
               <TableCell className="font-medium">{task.title}</TableCell>
               <TableCell>{task.assignedTo}</TableCell>
               <TableCell>{renderPriorityBadge(task.priority)}</TableCell>
