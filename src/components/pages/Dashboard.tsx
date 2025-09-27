@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import MainLayout from "../layout/MainLayout";
+import Home from "../home";
 import {
   Card,
   CardContent,
@@ -17,14 +18,18 @@ import EndOfServiceCalculator from "../turnover/EndOfServiceCalculator";
 import { useAuth } from "@/contexts/AuthContext";
 
 const Dashboard = () => {
-  const [showLeaveForm, setShowLeaveForm] = useState(false);
-  const [showAdvanceForm, setShowAdvanceForm] = useState(false);
-  const [showHandoverForm, setShowHandoverForm] = useState(false);
-  const [showEndOfServiceCalculator, setShowEndOfServiceCalculator] =
-    useState(false);
-  const [activeTab, setActiveTab] = useState("personal");
   const { user } = useAuth();
   const isEmployee = user?.role === "employee";
+  
+  // If user is admin or org_admin, show the main dashboard
+  if (user?.role === "super_admin" || user?.role === "org_admin" || user?.role === "manager") {
+    return <Home />;
+  }
+  
+  // For employees, show personal dashboard
+  const [showLeaveForm, setShowLeaveForm] = useState(false);
+  const [showAdvanceForm, setShowAdvanceForm] = useState(false);
+  const [activeTab, setActiveTab] = useState("personal");
 
   // Mock employee data - in a real app, this would come from an API or context
   const employeeData = {
@@ -76,12 +81,6 @@ const Dashboard = () => {
     // Here you would send the data to your API
   };
 
-  const handleHandoverSubmit = (data) => {
-    console.log("Handover form submitted:", data);
-    setShowHandoverForm(false);
-    // Here you would send the data to your API
-  };
-
   return (
     <MainLayout
       title={`مرحباً ${user?.full_name || employeeData.name}`}
@@ -89,14 +88,11 @@ const Dashboard = () => {
     >
       <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
         <TabsList
-          className={`grid ${isEmployee ? "grid-cols-3" : "grid-cols-4"} mb-4`}
+          className="grid grid-cols-3 mb-4"
         >
           <TabsTrigger value="personal">البيانات الشخصية</TabsTrigger>
           <TabsTrigger value="tasks">المهام والجدول</TabsTrigger>
           <TabsTrigger value="requests">الطلبات</TabsTrigger>
-          {!isEmployee && (
-            <TabsTrigger value="endOfService">إنهاء الخدمة</TabsTrigger>
-          )}
         </TabsList>
 
         <TabsContent value="personal">
@@ -263,47 +259,6 @@ const Dashboard = () => {
               />
             </div>
           )}
-        </TabsContent>
-
-        <TabsContent value="endOfService">
-          <div className="grid grid-cols-1 gap-6 mb-8">
-            <div className="flex flex-wrap gap-4 mb-4">
-              <Button
-                onClick={() => {
-                  setShowHandoverForm(true);
-                  setShowEndOfServiceCalculator(false);
-                }}
-              >
-                نموذج التسليم والتسلم
-              </Button>
-              <Button
-                onClick={() => {
-                  setShowEndOfServiceCalculator(true);
-                  setShowHandoverForm(false);
-                }}
-              >
-                حساب مستحقات نهاية الخدمة
-              </Button>
-            </div>
-
-            {/* Handover Form */}
-            {showHandoverForm && (
-              <div className="mb-8">
-                <HandoverForm
-                  employeeData={employeeData}
-                  onSubmit={handleHandoverSubmit}
-                  onCancel={() => setShowHandoverForm(false)}
-                />
-              </div>
-            )}
-
-            {/* End of Service Calculator */}
-            {showEndOfServiceCalculator && (
-              <div className="mb-8">
-                <EndOfServiceCalculator employeeData={employeeData} />
-              </div>
-            )}
-          </div>
         </TabsContent>
       </Tabs>
     </MainLayout>
