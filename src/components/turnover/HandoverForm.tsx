@@ -19,12 +19,14 @@ interface HandoverFormProps {
   onSubmit?: (data: any) => void;
   onCancel?: () => void;
   employeeData?: any;
+  onBack?: () => void;
 }
 
 const HandoverForm = ({
   onSubmit,
   onCancel,
   employeeData,
+  onBack,
 }: HandoverFormProps = {}) => {
   const [selectedEmployee, setSelectedEmployee] = useState(
     employeeData?.name || "أحمد محمد",
@@ -477,15 +479,21 @@ const HandoverForm = ({
           <CardHeader className="print:pb-2">
             <CardTitle className="text-lg font-semibold flex justify-between items-center">
               نموذج التسليم والتسلم
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handlePrint}
-                className="no-print"
-              >
-                <Printer className="h-4 w-4 ml-2" />
-                طباعة
-              </Button>
+              <div className="flex gap-2 no-print">
+                {onBack && (
+                  <Button variant="outline" size="sm" onClick={onBack}>
+                    العودة
+                  </Button>
+                )}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handlePrint}
+                >
+                  <Printer className="h-4 w-4 ml-2" />
+                  طباعة
+                </Button>
+              </div>
             </CardTitle>
           </CardHeader>
           <CardContent className="print:p-0">
