@@ -22,6 +22,7 @@ import {
   FileText,
   Layers3,
   Shield,
+  UserX,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -180,6 +181,12 @@ const Sidebar = ({ className }: SidebarProps) => {
       id: "custody",
       icon: <Shield size={20} />,
       label: "إدارة العهد",
+      permission: null,
+    },
+    {
+      id: "end-of-service",
+      icon: <UserX size={20} />,
+      label: "إنهاء الخدمة",
       permission: null,
     },
     {

@@ -31,6 +31,7 @@ import OrganizationalStructure from "./components/pages/OrganizationalStructure"
 import PlanningAndExecution from "./components/pages/PlanningAndExecution";
 import LettersAndNotices from "./components/pages/LettersAndNotices";
 import Custody from "./components/pages/Custody";
+import EndOfService from "./components/pages/EndOfService";
 
 function App() {
   const AppContent = () => (
@@ -64,6 +65,7 @@ function App() {
         />
         <Route path="/letters-and-notices" element={<LettersAndNotices />} />
         <Route path="/custody" element={<Custody />} />
+        <Route path="/end-of-service" element={<EndOfService />} />
 
         {/* Add this before the catchall route */}
         {import.meta.env.VITE_TEMPO && <Route path="/tempobook/*" />}

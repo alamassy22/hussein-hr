@@ -15,6 +15,7 @@ import PrintWrapper from "@/components/ui/print-wrapper";
 
 interface EndOfServiceCalculatorProps {
   employeeData?: any;
+  onBack?: () => void;
 }
 
 // Employee data with salary and leave information
@@ -88,6 +89,7 @@ const availableEmployees = [
 
 const EndOfServiceCalculator = ({
   employeeData,
+  onBack,
 }: EndOfServiceCalculatorProps = {}) => {
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<string>("");
   const [currentEmployeeData, setCurrentEmployeeData] = useState(
@@ -533,10 +535,17 @@ const EndOfServiceCalculator = ({
           <CardHeader className="no-print print:hidden">
             <CardTitle className="text-lg font-semibold flex justify-between items-center">
               حساب مستحقات نهاية الخدمة
-              <Button variant="outline" size="sm" onClick={handlePrint}>
-                <Printer className="h-4 w-4 ml-2" />
-                طباعة
-              </Button>
+              <div className="flex gap-2">
+                {onBack && (
+                  <Button variant="outline" size="sm" onClick={onBack}>
+                    العودة
+                  </Button>
+                )}
+                <Button variant="outline" size="sm" onClick={handlePrint}>
+                  <Printer className="h-4 w-4 ml-2" />
+                  طباعة
+                </Button>
+              </div>
             </CardTitle>
           </CardHeader>
           <CardContent className="print:p-0">
